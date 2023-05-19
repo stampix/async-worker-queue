@@ -1,4 +1,4 @@
-# @stampix/async-worker-queue
+# async-worker-queue
 
 ## 0.1.0
 

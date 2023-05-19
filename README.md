@@ -1,26 +1,26 @@
-# @stampix/async-worker-queue
+# async-worker-queue
 
-`@stampix/async-worker-queue` is an library written in TypeScript that provides a simple and efficient way to manage a queue of asynchronous tasks using worker threads.
+`async-worker-queue` is an library written in TypeScript that provides a simple and efficient way to manage a queue of asynchronous tasks using worker threads.
 It exposes a single class `AsyncWorkerQueue` that encapsulates the functionality of the package.
 
 ## Installation
 
-You can install `@stampix/async-worker-queue` using npm:
+You can install `async-worker-queue` using npm:
 
 ```shell
-npm install @stampix/async-worker-queue
+npm install async-worker-queue
 ```
 
 Alternatively, you can use yarn:
 
 ```shell
-yarn add @stampix/async-worker-queue
+yarn add async-worker-queue
 ```
 
 Or, if you prefer to use pnpm:
 
 ```shell
-pnpm add @stampix/async-worker-queue
+pnpm add async-worker-queue
 ```
 
 ## Usage
@@ -28,7 +28,7 @@ pnpm add @stampix/async-worker-queue
 To use `AsyncWorkerQueue`, first import the package:
 
 ```typescript
-import { AsyncWorkerQueue } from '@stampix/async-worker-queue';
+import { AsyncWorkerQueue } from 'async-worker-queue';
 ```
 
 ### Class: AsyncWorkerQueue
@@ -80,7 +80,7 @@ it is recommended to call this method explicitly before enqueuing tasks to avoid
 Here's a basic example that demonstrates the usage of `AsyncWorkerQueue`:
 
 ```typescript
-import { AsyncWorkerQueue } from '@stampix/async-worker-queue';
+import { AsyncWorkerQueue } from 'async-worker-queue';
 
 // Function that creates a worker thread
 const createWorker = (i: number): Promise<Execute<T, R>> => {

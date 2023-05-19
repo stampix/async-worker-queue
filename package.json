@@ -1,5 +1,5 @@
 {
-  "name": "@stampix/async-worker-queue",
+  "name": "async-worker-queue",
   "version": "0.1.0",
   "description": "A queue for async tasks that can be run in parallel with a maximum concurrency",
   "main": "dist/index.cjs",
