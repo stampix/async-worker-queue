@@ -1,6 +1,6 @@
 {
   "name": "@stampix/async-worker-queue",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "A queue for async tasks that can be run in parallel with a maximum concurrency",
   "main": "dist/index.cjs",
   "module": "dist/index.js",
@@ -16,7 +16,8 @@
     "prettier": "prettier --write",
     "prepare": "husky install",
     "types": "tsc --noEmit",
-    "build": "tsup src/index.ts --dts --format esm,cjs"
+    "build": "tsup src/index.ts --dts --format esm,cjs",
+    "changeset": "changeset"
   },
   "keywords": [
     "async",
