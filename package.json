@@ -1,0 +1,53 @@
+{
+  "name": "@stampix/async-worker-queue",
+  "version": "1.0.0",
+  "description": "A queue for async tasks that can be run in parallel with a maximum concurrency",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "source": "src/index",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint --fix",
+    "prettier": "prettier --write",
+    "prepare": "husky install",
+    "types": "tsc --noEmit",
+    "build": "tsup src/index.ts --dts --format esm,cjs"
+  },
+  "keywords": [
+    "async",
+    "worker",
+    "queue"
+  ],
+  "repository": "https://github.com/stampix/image-tools",
+  "author": "Stampix <dev@stampix.com> (https://stampix.com)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/stampix/async-worker-queue"
+  },
+  "homepage": "https://github.com/stampix/async-worker-queue#readme",
+  "devDependencies": {
+    "@changesets/cli": "^2.26.1",
+    "@typescript-eslint/eslint-plugin": "^5.59.6",
+    "@typescript-eslint/parser": "^5.59.6",
+    "commitlint": "^17.6.3",
+    "eslint": "^8.40.0",
+    "eslint-config-prettier": "^8.8.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.2.2",
+    "prettier": "^2.8.8",
+    "tsup": "^6.7.0",
+    "typescript": "^5.0.4"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "prettier --write",
+      "eslint --fix",
+      "tsc --noEmit"
+    ]
+  }
+}
