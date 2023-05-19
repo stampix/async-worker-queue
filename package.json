@@ -12,8 +12,10 @@
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint --fix",
-    "prettier": "prettier --write",
+    "lint:check": "eslint src",
+    "lint": "eslint --fix src",
+    "prettier:check": "prettier src",
+    "prettier": "prettier --write src",
     "prepare": "husky install",
     "types": "tsc --noEmit",
     "build": "tsup src/index.ts --dts --format esm,cjs",
