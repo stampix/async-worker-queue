@@ -19,7 +19,8 @@
     "prepare": "husky install",
     "types": "tsc --noEmit",
     "build": "tsup src/index.ts --dts --format esm,cjs",
-    "changeset": "changeset"
+    "changeset": "changeset",
+    "release": "changeset version && changeset publish"
   },
   "keywords": [
     "async",
