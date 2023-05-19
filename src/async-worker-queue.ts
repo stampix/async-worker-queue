@@ -1,16 +1,16 @@
 class Queue<T> {
-  private _items: T[];
+  #items: T[];
   constructor() {
-    this._items = [];
+    this.#items = [];
   }
   enqueue(item: T) {
-    this._items.push(item);
+    this.#items.push(item);
   }
   dequeue() {
-    return this._items.shift();
+    return this.#items.shift();
   }
   get size() {
-    return this._items.length;
+    return this.#items.length;
   }
 }
 export type Execute<T, R> = (payload: T) => Promise<R>;
@@ -19,22 +19,28 @@ export interface Worker<T, R> {
   busy: boolean;
   index: number;
 }
+export interface AsyncWorkerQueueOptions {
+  removeWorkerOnError?: boolean;
+  recreateWorkerOnError?: boolean;
+}
 export class AsyncWorkerQueue<T, R> {
-  private _queue = new Queue<{
+  #queue = new Queue<{
     payload: T;
     resolve: (value: R | PromiseLike<R>) => void;
     reject: (reason?: unknown) => void;
   }>();
-  private _workers = new Set<Worker<T, R>>();
-  private _initialising = false;
+  #workers = new Set<Worker<T, R>>();
+  #initialising = false;
+  #createWorker: (i: number) => Promise<Execute<T, R>>;
+  #options: AsyncWorkerQueueOptions;
   constructor(
-    private _createWorker: (i: number) => Promise<Execute<T, R>>,
+    createWorker: (i: number) => Promise<Execute<T, R>>,
     public concurrency: number,
-    private _options: {
-      removeWorkerOnError?: boolean;
-      recreateWorkerOnError?: boolean;
-    } = {}
-  ) {}
+    options: AsyncWorkerQueueOptions = {}
+  ) {
+    this.#createWorker = createWorker;
+    this.#options = options;
+  }
 
   /**
    * Initialised the queue if it hasn't been initialised yet.
@@ -43,48 +49,48 @@ export class AsyncWorkerQueue<T, R> {
    * If not called, the queue will be initialised when the first task is enqueued.
    */
   public async initialise() {
-    this._initialising = true;
+    this.#initialising = true;
     // Create all the workers by calling the createWorker function.
     // They should all be idle at first.
     for (let i = 0; i < this.concurrency; i++) {
-      this._workers.add({
-        execute: await this._createWorker(i),
+      this.#workers.add({
+        execute: await this.#createWorker(i),
         busy: false,
         index: i,
       });
       // As soon as the first worker is initialised, we can start processing tasks that are potentially already pending.
-      if (this._workers.size === 1 && this._queue.size > 0) {
-        void this.dequeue();
+      if (this.#workers.size === 1 && this.#queue.size > 0) {
+        void this.#dequeue();
       }
     }
-    this._initialising = false;
+    this.#initialising = false;
   }
   get initialised() {
-    return this._workers.size > 0;
+    return this.#workers.size > 0;
   }
   public enqueue(payload: T): Promise<R> {
     // If we haven't initialised yet, do so now.
-    if (!this.initialised && !this._initialising) void this.initialise();
+    if (!this.initialised && !this.#initialising) void this.initialise();
     return new Promise<R>((resolve, reject) => {
-      this._queue.enqueue({ payload, resolve, reject });
+      this.#queue.enqueue({ payload, resolve, reject });
       // Start processing a new task.
-      void this.dequeue();
+      void this.#dequeue();
     });
   }
   /**
    * Returns the first free worker.
    * @private
    */
-  private getFreeWorker() {
-    return [...this._workers].find((worker) => !worker.busy);
+  #getFreeWorker() {
+    return [...this.#workers].find((worker) => !worker.busy);
   }
-  private async dequeue() {
+  async #dequeue() {
     // Do we have a free worker?
-    const worker = this.getFreeWorker();
+    const worker = this.#getFreeWorker();
     // If not, return, we'll be called again when a worker is free.
     if (!worker) return;
     // Do we have a task?
-    const task = this._queue.dequeue();
+    const task = this.#queue.dequeue();
     // If not, return, we'll be called again when a task is available.
     if (!task) return;
     try {
@@ -95,14 +101,14 @@ export class AsyncWorkerQueue<T, R> {
     } catch (e) {
       // If the worker errored, remove it from the list of workers.
       if (
-        this._options.removeWorkerOnError ||
-        this._options.recreateWorkerOnError
+        this.#options.removeWorkerOnError ||
+        this.#options.recreateWorkerOnError
       ) {
-        this._workers.delete(worker);
+        this.#workers.delete(worker);
       }
-      if (this._options.recreateWorkerOnError) {
-        this._workers.add({
-          execute: await this._createWorker(worker.index),
+      if (this.#options.recreateWorkerOnError) {
+        this.#workers.add({
+          execute: await this.#createWorker(worker.index),
           busy: false,
           index: worker.index,
         });
@@ -110,7 +116,7 @@ export class AsyncWorkerQueue<T, R> {
       worker.busy = false;
       task.reject(e);
     } finally {
-      void this.dequeue();
+      void this.#dequeue();
     }
   }
 }
