@@ -120,3 +120,5 @@ export class AsyncWorkerQueue<T, R> {
     }
   }
 }
+
+export default AsyncWorkerQueue;
