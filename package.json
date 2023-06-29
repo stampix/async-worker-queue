@@ -27,7 +27,7 @@
     "worker",
     "queue"
   ],
-  "repository": "https://github.com/stampix/image-tools",
+  "repository": "https://github.com/stampix/async-worker-queue",
   "author": "Stampix <dev@stampix.com> (https://stampix.com)",
   "license": "MIT",
   "bugs": {
