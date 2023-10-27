@@ -13,14 +13,29 @@ class Queue<T> {
     return this.#items.length;
   }
 }
-export type Execute<T, R> = (payload: T) => Promise<R>;
+export type Execute<T, R> = (payload: T) => Promise<R> | R;
+export type Dispose = () => Promise<void> | void;
+export interface CreateWorkerResult<T, R> {
+  execute: Execute<T, R>;
+  dispose: Dispose;
+}
 export interface Worker<T, R> {
   execute: Execute<T, R>;
+  dispose: Dispose;
   busy: boolean;
   index: number;
 }
 export interface AsyncWorkerQueueOptions {
+  /**
+   * If true, the worker will be removed from the list of workers when it errors.
+   * It will also dispose the worker.
+   * No new worker will be created to replace it, unless `recreateWorkerOnError` is also set to true.
+   */
   removeWorkerOnError?: boolean;
+  /**
+   * If true, the worker will be recreated when it errors.
+   * The original worker will remain unless `removeWorkerOnError` is also set to true.
+   */
   recreateWorkerOnError?: boolean;
 }
 export class AsyncWorkerQueue<T, R> {
@@ -31,10 +46,14 @@ export class AsyncWorkerQueue<T, R> {
   }>();
   #workers = new Set<Worker<T, R>>();
   #initialising = false;
-  #createWorker: (i: number) => Promise<Execute<T, R>>;
+  readonly #createWorker: (
+    i: number
+  ) => Promise<CreateWorkerResult<T, R>> | CreateWorkerResult<T, R>;
   #options: AsyncWorkerQueueOptions;
   constructor(
-    createWorker: (i: number) => Promise<Execute<T, R>>,
+    createWorker: (
+      i: number
+    ) => Promise<CreateWorkerResult<T, R>> | CreateWorkerResult<T, R>,
     public concurrency: number,
     options: AsyncWorkerQueueOptions = {}
   ) {
@@ -53,8 +72,10 @@ export class AsyncWorkerQueue<T, R> {
     // Create all the workers by calling the createWorker function.
     // They should all be idle at first.
     for (let i = 0; i < this.concurrency; i++) {
+      const worker = await this.#createWorker(i);
       this.#workers.add({
-        execute: await this.#createWorker(i),
+        execute: worker.execute,
+        dispose: worker.dispose,
         busy: false,
         index: i,
       });
@@ -104,11 +125,15 @@ export class AsyncWorkerQueue<T, R> {
         this.#options.removeWorkerOnError ||
         this.#options.recreateWorkerOnError
       ) {
+        // Dispose it first, so it can clean up any resources it might be using.
+        await worker.dispose();
         this.#workers.delete(worker);
       }
       if (this.#options.recreateWorkerOnError) {
+        const newWorker = await this.#createWorker(worker.index);
         this.#workers.add({
-          execute: await this.#createWorker(worker.index),
+          execute: newWorker.execute,
+          dispose: newWorker.dispose,
           busy: false,
           index: worker.index,
         });
@@ -118,6 +143,23 @@ export class AsyncWorkerQueue<T, R> {
     } finally {
       void this.#dequeue();
     }
+  }
+
+  /**
+   * Destroys the queue and all workers.
+   *
+   * You should not use this queue after calling this function.
+   */
+  async dispose() {
+    for (const worker of this.#workers) {
+      await worker.dispose();
+    }
+    this.#workers = new Set<Worker<T, R>>();
+    this.#queue = new Queue<{
+      payload: T;
+      resolve: (value: R | PromiseLike<R>) => void;
+      reject: (reason?: unknown) => void;
+    }>();
   }
 }
 
