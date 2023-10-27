@@ -1,5 +1,11 @@
 # async-worker-queue
 
+## 0.2.0
+
+### Minor Changes
+
+- 40f13ba: Support disposing workers
+
 ## 0.1.2
 
 ### Patch Changes
