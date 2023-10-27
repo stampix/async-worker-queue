@@ -1,6 +1,6 @@
 {
   "name": "async-worker-queue",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A queue for async tasks that can be run in parallel with a maximum concurrency",
   "main": "dist/index.cjs",
   "module": "dist/index.js",

@@ -1,5 +1,11 @@
 # async-worker-queue
 
+## 0.2.1
+
+### Patch Changes
+
+- b859a40: Export all types
+
 ## 0.2.0
 
 ### Minor Changes
