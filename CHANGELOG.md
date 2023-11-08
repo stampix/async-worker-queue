@@ -1,5 +1,11 @@
 # async-worker-queue
 
+## 0.2.2
+
+### Patch Changes
+
+- dcb02fe: Proper handling of errors during worker creation
+
 ## 0.2.1
 
 ### Patch Changes
