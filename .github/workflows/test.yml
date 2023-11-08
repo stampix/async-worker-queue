@@ -1,8 +1,5 @@
-name: Release
-on:
-  push:
-    branches:
-      - main
+name: Test
+on: [pull_request]
 
 jobs:
   release:
@@ -23,13 +20,5 @@ jobs:
         run: pnpm prettier:check && pnpm lint:check
       - name: Build
         run: pnpm build
-      - name: Create Release Pull Request or Publish
-        id: changesets
-        uses: changesets/action@v1
-        with:
-          publish: pnpm release # Will also run styling, linting, building & testing
-          title: "ci: version packages"
-          commit: "ci: version packages"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Test
+        run: pnpm test

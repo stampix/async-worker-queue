@@ -46,10 +46,18 @@ export class AsyncWorkerQueue<T, R> {
   }>();
   #workers = new Set<Worker<T, R>>();
   #initialising = false;
+  #initialised = false;
   readonly #createWorker: (
     i: number
   ) => Promise<CreateWorkerResult<T, R>> | CreateWorkerResult<T, R>;
   #options: AsyncWorkerQueueOptions;
+
+  /**
+   * Creates a new AsyncWorkerQueue.
+   * @param createWorker A function that creates a worker.
+   * @param concurrency The number of concurrent workers to use.
+   * @param options Options for the queue.
+   */
   constructor(
     createWorker: (
       i: number
@@ -57,6 +65,7 @@ export class AsyncWorkerQueue<T, R> {
     public concurrency: number,
     options: AsyncWorkerQueueOptions = {}
   ) {
+    if (concurrency < 1) throw new Error("Concurrency must be greater than 0");
     this.#createWorker = createWorker;
     this.#options = options;
   }
@@ -68,6 +77,7 @@ export class AsyncWorkerQueue<T, R> {
    * If not called, the queue will be initialised when the first task is enqueued.
    */
   public async initialise() {
+    if (this.#initialised) return;
     this.#initialising = true;
     // Create all the workers by calling the createWorker function.
     // They should all be idle at first.
@@ -85,17 +95,30 @@ export class AsyncWorkerQueue<T, R> {
       }
     }
     this.#initialising = false;
+    this.#initialised = true;
   }
-  get initialised() {
-    return this.#workers.size > 0;
-  }
-  public enqueue(payload: T): Promise<R> {
-    // If we haven't initialised yet, do so now.
-    if (!this.initialised && !this.#initialising) void this.initialise();
+  public async enqueue(payload: T): Promise<R> {
     return new Promise<R>((resolve, reject) => {
+      // If we haven't initialised yet, do so now.
+      if (!this.#initialised && !this.#initialising) {
+        void this.initialise().catch(() => {
+          // If we initialised but errors were thrown, we might not have any workers,
+          // reject the promise because we cannot process this payload.
+          if (this.#workers.size === 0) {
+            reject(new Error("No available workers"));
+          }
+        });
+      } else {
+        // If we are initialised, but have no workers, reject the promise because we cannot process this payload.
+        if (this.#workers.size === 0) {
+          reject(new Error("No available workers"));
+        }
+      }
       this.#queue.enqueue({ payload, resolve, reject });
-      // Start processing a new task.
-      void this.#dequeue();
+      // Start processing a new task if we have any workers already (i.e. initialised)
+      if (this.#workers.size > 0) {
+        void this.#dequeue();
+      }
     });
   }
   /**
