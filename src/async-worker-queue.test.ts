@@ -1,7 +1,7 @@
 import { expect, test } from "vitest";
 import AsyncWorkerQueue from "./async-worker-queue";
 
-test("Should have a concurrency of at least 1", async () => {
+test("Should have a concurrency of at least 1", () => {
   expect(
     () =>
       new AsyncWorkerQueue<number, number>(() => {
