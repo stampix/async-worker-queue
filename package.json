@@ -11,7 +11,7 @@
     "dist"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "vitest",
     "lint:check": "eslint src",
     "lint": "eslint --fix src",
     "prettier:check": "prettier src",
@@ -45,7 +45,8 @@
     "lint-staged": "^13.2.2",
     "prettier": "^2.8.8",
     "tsup": "^6.7.0",
-    "typescript": "^5.0.4"
+    "typescript": "^5.0.4",
+    "vitest": "^0.34.6"
   },
   "publishConfig": {
     "access": "public"
