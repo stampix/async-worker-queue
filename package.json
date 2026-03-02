@@ -7,6 +7,7 @@
   "types": "dist/index.d.ts",
   "source": "src/index",
   "type": "module",
+  "packageManager": "pnpm@10.30.3",
   "files": [
     "dist"
   ],
@@ -15,8 +16,8 @@
     "lint:check": "eslint src",
     "lint": "eslint --fix src",
     "prettier:check": "prettier src",
-    "prettier": "prettier --write src",
-    "prepare": "husky install",
+    "format": "prettier --write src",
+    "prepare": "husky",
     "types": "tsc --noEmit",
     "build": "tsup src/index.ts --dts --format esm,cjs",
     "changeset": "changeset",
@@ -35,18 +36,16 @@
   },
   "homepage": "https://github.com/stampix/async-worker-queue#readme",
   "devDependencies": {
-    "@changesets/cli": "^2.26.1",
-    "@typescript-eslint/eslint-plugin": "^5.59.6",
-    "@typescript-eslint/parser": "^5.59.6",
-    "commitlint": "^17.6.3",
-    "eslint": "^8.40.0",
-    "eslint-config-prettier": "^8.8.0",
-    "husky": "^8.0.3",
-    "lint-staged": "^13.2.2",
-    "prettier": "^2.8.8",
-    "tsup": "^6.7.0",
-    "typescript": "^5.0.4",
-    "vitest": "^0.34.6"
+    "@changesets/cli": "^2.29.8",
+    "@stampix/eslint-config": "^3.0.0",
+    "commitlint": "^20.4.2",
+    "eslint": "^9.32.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.3.1",
+    "prettier": "^3.8.1",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
   },
   "publishConfig": {
     "access": "public"

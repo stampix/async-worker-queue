@@ -48,7 +48,7 @@ export class AsyncWorkerQueue<T, R> {
   #initialising = false;
   #initialised = false;
   readonly #createWorker: (
-    i: number
+    i: number,
   ) => Promise<CreateWorkerResult<T, R>> | CreateWorkerResult<T, R>;
   #options: AsyncWorkerQueueOptions;
 
@@ -60,10 +60,10 @@ export class AsyncWorkerQueue<T, R> {
    */
   constructor(
     createWorker: (
-      i: number
+      i: number,
     ) => Promise<CreateWorkerResult<T, R>> | CreateWorkerResult<T, R>,
     public concurrency: number,
-    options: AsyncWorkerQueueOptions = {}
+    options: AsyncWorkerQueueOptions = {},
   ) {
     if (concurrency < 1) throw new Error("Concurrency must be greater than 0");
     this.#createWorker = createWorker;

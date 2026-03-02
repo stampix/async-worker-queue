@@ -6,7 +6,7 @@ test("Should have a concurrency of at least 1", () => {
     () =>
       new AsyncWorkerQueue<number, number>(() => {
         throw new Error("Unreachable");
-      }, 0)
+      }, 0),
   ).toThrow("Concurrency must be greater than 0");
 });
 
@@ -86,7 +86,7 @@ test("Should fail if no workers are available because they all got disposed", as
     5,
     {
       removeWorkerOnError: true,
-    }
+    },
   );
   // Push 5 tasks through, which will all fail
   for (let i = 0; i < 5; i++) {
@@ -110,7 +110,7 @@ test("Should recreate workers and therefore not care if anything fails", async (
     {
       removeWorkerOnError: true,
       recreateWorkerOnError: true,
-    }
+    },
   );
   // Push 5 tasks through, which will all fail
   for (let i = 0; i < 5; i++) {
